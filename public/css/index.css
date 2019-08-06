@@ -4,7 +4,7 @@
     height: 200px;
     margin: auto;
     padding: auto;
-    border: 1px solid black;
+    /* border: 1px solid black; */
 }
 
 #flag {
@@ -13,4 +13,54 @@
     height: 100%;
     margin: auto;
     padding: auto;
+}
+
+.table {
+    overflow-y: scroll;
+    display: block;
+    width: 100%;
+    height: 200px;
+    margin: auto;
+    padding: auto;
+    /* border: 1px solid black; */
+
+}
+
+.table tbody th {
+    text-align: left;
+    width: 200px;
+}
+
+.table tbody tr {
+    display: block;
+    width: 100%;
+    margin: auto;
+    padding: auto;
+    border-bottom: 1px solid lightgray;
+}
+
+#mainContainer {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+#selectCountries {
+    font-size: 18px;
+}
+
+.table tbody {
+    display: block;
+    width: 100%;
+    margin: auto;
+    padding: auto;
+}
+
+#mapid {
+    display: block;
+    width: 100%;
+    margin: auto;
+    padding: auto;
+    height: 400px;
 }

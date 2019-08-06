@@ -5,65 +5,80 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css" integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js" integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og==" crossorigin=""></script>
     <link rel="stylesheet" href="css/index.css">
     <title>REST Countries API</title>
 </head>
 <body>
-    <div class="container text-center">
-        <h1 class="display-5">COUNTRY INFORMATION</h1>
-        <br>
-        <div class="row justify-content-md-center">
-            <div class="col-md-12">
-                <select name="" id="selectCountries" onchange="chooseCountry();"></select>
-            </div>
-        </div>
-        <br>
-        <div class="row justify-content-md-center">
-            <div class="col-md-4" id="content">
-                <div id="image">
-                    <img src="" alt="" id="flag">
+    <div class="container text-center" id="mainContainer">
+        <div class="jumbotron bg-light">
+            <h1 class="display-5">COUNTRY INFORMATION</h1>
+            <br>
+            <div class="row justify-content-md-center">
+                <div class="col-md-12">
+                    <select name="" id="selectCountries" onchange="chooseCountry();" class="form-control"></select>
                 </div>
-                <div>
+            </div>
+            <br>
+            <div class="row justify-content-md-center">
+                <div class="col-md-5" id="content">
+                    <div id="image">
+                        <img src="" alt="country flag" id="flag">
+                    </div>
+                </div>
+                <div class="col-md-7">
                     <table class="table">
                         <tbody>
-                            <tr>
-                                <th>Country Name:</th>
+                            <tr style="border-top: 1px solid lightgrey">
+                                <th>Country Name</th>
                                 <td id="CountryName"></td>
                             </tr>
                             <tr>
-                                <th>Capital:</th>
+                                <th>Capital</th>
                                 <td id="Capital"></td>
                             </tr>
                             <tr>
-                                <th>Dialing Code:</th>
+                                <th>Dialing Code</th>
                                 <td id="DialingCode"></td>
                             </tr>
                             <tr>
-                                <th>Population:</th>
+                                <th>Population</th>
                                 <td id="Population"></td>
                             </tr>
                             <tr>
-                                <th>Currencies:</th>
+                                <th>Currencies</th>
                                 <td id="Currencies"></td>
                             </tr>
                             <tr>
-                                <th>Region:</th>
+                                <th>Region</th>
                                 <td id="Region"></td>
                             </tr>
                             <tr>
-                                <th>Sub-region:</th>
+                                <th>Sub-region</th>
                                 <td id="SubRegion"></td>
+                            </tr>
+                            <tr>
+                                <th>Timezone/s</th>
+                                <td id="Timezone"></td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
+            <br>
+            <div class="row justify-content-md-center">
+                <div class="col-md-12">
+                    <div id="mapid"></div>
+                </div>
+            </div>
         </div>
-    </div>
+     </div>
 </body>
 <script src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
 <script>
-    
+    var mymap = new L.map('mapid').setView([51.505, -0.09], 13);
+    var marker = "";
     async function getData() {
         const response = await fetch("https://restcountries.eu/rest/v2/all");
         const responseData = await response.json();
@@ -85,30 +100,65 @@
             url: 'fetchCountries',
             method: 'GET',
             success: function(data) {
+                $('#selectCountries').append($('<option selected disabled>').text('Select A Country'));
                 for(var i = 0; i < data.data.length; i++) {
+                    if (i == 0) {
+                        $('#selectCountries').append($('<option value='+i+'>').text(data.data[i].name));
+                        continue;
+                    }
                     $('#selectCountries').append($('<option value='+i+'>').text(data.data[i].name));
                 }
             }
         });
+        L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+            maxZoom: 18,
+            id: 'mapbox.streets',
+            accessToken: 'pk.eyJ1IjoiY2VlanRheWNvIiwiYSI6ImNqejAxZGs1cDA3b3ozY3FnNWRlcndwZXUifQ.s3vIn5545aOvW5U9dI9bAA'
+        }).addTo(mymap);
+        marker = L.marker([51.505, -0.09]).addTo(mymap); 
     }
 
     async function chooseCountry() {
         const country = document.getElementById("selectCountries").value;
+        var latitude = 0;
+        var longitude = 0;
         $.ajax({
             url: 'fetchCountries',
             method: 'GET',
             success: function(data) {
+                latitude = data.data[country].latlng[0];
+                longitude = data.data[country].latlng[1];
                 document.querySelector("#image img").src = data.data[country].flag;
                 document.getElementById("CountryName").textContent = data.data[country].name;
                 document.getElementById("Capital").textContent = data.data[country].capital;
                 document.getElementById("DialingCode").textContent = data.data[country].callingCodes;
                 document.getElementById("Population").textContent = data.data[country].population;
-            }
-        });
-        
-    }
+                document.getElementById("Currencies").textContent = data.data[country].currencies[0].symbol + " " + data.data[country].currencies[0].name;
+                document.getElementById("Region").textContent = data.data[country].region;
+                document.getElementById("SubRegion").textContent = data.data[country].subregion;
 
-    getData();
+                //Timezone
+                var timezone_string = "";
+                for(var i = 0; i < data.data[country].timezones.length; i++) {
+                    timezone_string += data.data[country].timezones[i] + "; ";
+                }
+                document.getElementById("Timezone").textContent = timezone_string;
+
+                // open street maps
+                mymap.removeLayer(marker);
+                L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+                    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+                    maxZoom: 18,
+                    id: 'mapbox.streets',
+                    accessToken: 'pk.eyJ1IjoiY2VlanRheWNvIiwiYSI6ImNqejAxZGs1cDA3b3ozY3FnNWRlcndwZXUifQ.s3vIn5545aOvW5U9dI9bAA'
+                }).addTo(mymap);
+                mymap.setView([data.data[country].latlng[0],data.data[country].latlng[1]], 5.65);   
+                marker = L.marker([latitude, longitude]).addTo(mymap); 
+            }
+        });    
+    }
     
+    getData();
 </script>
 </html>
