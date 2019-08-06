@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/index.css">
+    <title>REST Countries API</title>
+</head>
+<body>
+    <div class="container text-center">
+        <h1 class="display-5">COUNTRY INFORMATION</h1>
+        <br>
+        <div class="row justify-content-md-center">
+            <div class="col-md-12">
+                <select name="" id="selectCountries" onchange="chooseCountry();"></select>
+            </div>
+        </div>
+        <br>
+        <div class="row justify-content-md-center">
+            <div class="col-md-4" id="content">
+                <div id="image">
+                    <img src="" alt="" id="flag">
+                </div>
+                <div>
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <th>Country Name:</th>
+                                <td id="CountryName"></td>
+                            </tr>
+                            <tr>
+                                <th>Capital:</th>
+                                <td id="Capital"></td>
+                            </tr>
+                            <tr>
+                                <th>Dialing Code:</th>
+                                <td id="DialingCode"></td>
+                            </tr>
+                            <tr>
+                                <th>Population:</th>
+                                <td id="Population"></td>
+                            </tr>
+                            <tr>
+                                <th>Currencies:</th>
+                                <td id="Currencies"></td>
+                            </tr>
+                            <tr>
+                                <th>Region:</th>
+                                <td id="Region"></td>
+                            </tr>
+                            <tr>
+                                <th>Sub-region:</th>
+                                <td id="SubRegion"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
+<script>
+    
+    async function getData() {
+        const response = await fetch("https://restcountries.eu/rest/v2/all");
+        const responseData = await response.json();
+        console.log(responseData);
+        var options = {
+            method: 'POST',
+            body: JSON.stringify(responseData),
+            headers: {
+            'Content-Type': 'application/json',
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+            }
+        };
+        const response_country = await fetch("/getCountryNames", options);
+        const response_data = await response_country.json();
+        console.log(response_data);
+
+        //INSERT COUNTRIES TO SELECT COMPONENT
+        $.ajax({
+            url: 'fetchCountries',
+            method: 'GET',
+            success: function(data) {
+                for(var i = 0; i < data.data.length; i++) {
+                    $('#selectCountries').append($('<option value='+i+'>').text(data.data[i].name));
+                }
+            }
+        });
+    }
+
+    async function chooseCountry() {
+        const country = document.getElementById("selectCountries").value;
+        $.ajax({
+            url: 'fetchCountries',
+            method: 'GET',
+            success: function(data) {
+                document.querySelector("#image img").src = data.data[country].flag;
+                document.getElementById("#CountryName").textContent = data.data[country].name;
+                document.getElementById("#Capital").textContent = data.data[country].capital;
+                document.getElementById("#DialingCode").textContent = data.data[country].callingCodes;
+                document.getElementById("#Population").textContent = data.data[country].population;
+            }
+        });
+        
+    }
+
+    getData();
+    
+</script>
+</html>
