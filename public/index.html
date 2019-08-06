@@ -99,10 +99,10 @@
             method: 'GET',
             success: function(data) {
                 document.querySelector("#image img").src = data.data[country].flag;
-                document.getElementById("#CountryName").textContent = data.data[country].name;
-                document.getElementById("#Capital").textContent = data.data[country].capital;
-                document.getElementById("#DialingCode").textContent = data.data[country].callingCodes;
-                document.getElementById("#Population").textContent = data.data[country].population;
+                document.getElementById("CountryName").textContent = data.data[country].name;
+                document.getElementById("Capital").textContent = data.data[country].capital;
+                document.getElementById("DialingCode").textContent = data.data[country].callingCodes;
+                document.getElementById("Population").textContent = data.data[country].population;
             }
         });
         
